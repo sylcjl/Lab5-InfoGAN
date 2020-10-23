@@ -2,6 +2,7 @@ import struct
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 from PIL import Image
 import os
 
@@ -14,8 +15,7 @@ class mnist_dataset(Dataset):
             self.x = np.expand_dims(self.x, axis = 1)
             
     def __getitem__(self, idx):
-        x = torch.from_numpy(np.float32(self.x[idx]))
-
+        x = transforms.Compose([transforms.ToTensor()])(self.x[idx]).permute(1,2,0)
         sample = {'x': x}
 
 
@@ -23,14 +23,10 @@ class mnist_dataset(Dataset):
 
     def __len__(self):
         return self.x.shape[0]
-     
+
 
 def getTrainingData(batch_size=128):
     training_data = mnist_dataset()
     dataloader_training = DataLoader(training_data, batch_size,
                                      shuffle=True, num_workers=10, pin_memory=False)
     return dataloader_training
-
-
-   
-    
