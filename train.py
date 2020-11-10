@@ -59,8 +59,7 @@ def weights_init(m):
 
 class NormalNLLLoss(nn.Module):
     """
-    Calculate the negative log likelihood
-    of normal distribution.
+    Calculate the negative log likelihood of normal distribution.
     This needs to be minimised.
     Treating Q(cj | x) as a factored Gaussian.
     """
@@ -150,13 +149,13 @@ criterionQ_cont = NormalNLLLoss().to(device)
 # they are used to record loss at each epoch so as to plot loss curve
 plot_D, plot_G, plot_info, plot_info_cont = [], [], [], []
 
-# start training 
+# start training
 for epoch in range(opt.n_epochs):
     netD.train()
     netShared.train()
     netG.train()
     netQ.train()
-    
+
     # these are loss for disciminator, generator, and classifier
     # they can help you record the loss in a csv file
     print_D, print_G, print_info, print_info_cont = 0, 0, 0, 0
@@ -194,7 +193,8 @@ for epoch in range(opt.n_epochs):
         loss_real = criterionD(output_real, label_real)
         loss_real.backward()
 
-        noise_input, c_disc_idx, c_cont = sample_noise(batch_size, opt.dim_noise, opt.dim_dis_latent, opt.dim_con_latent)
+        noise_input, c_disc_idx, c_cont = sample_noise(batch_size, opt.dim_noise,
+                                                       opt.dim_dis_latent, opt.dim_con_latent)
         data_fake = netG(noise_input)
         shared_fake = netShared(data_fake.detach())
         output_fake = netD(shared_fake)
@@ -203,7 +203,7 @@ for epoch in range(opt.n_epochs):
 
         D_loss = loss_real + loss_fake
         optimD.step()
-        
+
         ############################
         # (2) Update G & Q network: maximize log(D(G(z))) + LI(G,Q)
         ############################
@@ -236,7 +236,7 @@ for epoch in range(opt.n_epochs):
     print_G    /= len(dataloader)
     print_info /= len(dataloader)
     print_info_cont /= len(dataloader)
-    
+
     plot_D.append(print_D)
     plot_G.append(print_G)
     plot_info.append(print_info)
@@ -249,7 +249,9 @@ for epoch in range(opt.n_epochs):
     # this help to save model
     torch.save({
             'netG': netG,
-            'netD': netD
+            'netD': netD,
+            'netShared': netShared,
+            'netQ': netQ,
         }, os.path.join(chpt_path, 'model_{}.pt'.format(epoch))
     )
 
@@ -259,7 +261,7 @@ for epoch in range(opt.n_epochs):
     with torch.no_grad():
         fake = netG(val_data_inputs)
         vutils.save_image(fake.detach(), os.path.join(vis_path, 'result_{}.png'.format(epoch)), nrow=10)
-    
+
     # plot loss curve
     plt.title('Discriminator loss', fontsize=18)
     plt.plot(range(0, epoch+1), plot_D, 'red', label='D_loss')

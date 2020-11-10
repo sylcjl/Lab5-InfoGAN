@@ -13,11 +13,11 @@ class Generator(nn.Module):
         
         # Generator 
         self.main = nn.Sequential(
-            nn.ConvTranspose2d(in_dim, 1024, kernel_size=1, stride=1, bias=False),
-            nn.BatchNorm2d(1024),
+            nn.ConvTranspose2d(in_dim, 512, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(512),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
 
-            nn.ConvTranspose2d(1024, 256, kernel_size=4, stride=1, bias=False),
+            nn.ConvTranspose2d(512, 256, kernel_size=4, stride=1, bias=False),
             nn.BatchNorm2d(256),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
 
@@ -53,8 +53,8 @@ class SharedNet(nn.Module):
             nn.BatchNorm2d(128),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
 
-            nn.Conv2d(128, 1024, kernel_size=7, bias=False),
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(128, 256, kernel_size=7, bias=False),
+            nn.BatchNorm2d(256),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
         )
 
@@ -68,7 +68,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         # Discriminator branch
         self.main = nn.Sequential(
-            nn.Conv2d(1024, 1, kernel_size=1, stride=1),
+            nn.Conv2d(256, 1, kernel_size=1, stride=1),
             nn.Sigmoid()
         )
 
@@ -83,7 +83,7 @@ class QNet(nn.Module):
 
         # Info branch
         self.main = nn.Sequential(
-            nn.Conv2d(1024, 128, kernel_size=(1, 1), stride=(1, 1), bias=False),
+            nn.Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False),
             nn.BatchNorm2d(128),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
         )
